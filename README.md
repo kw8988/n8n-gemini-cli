@@ -6,6 +6,8 @@ While the original guide focuses on **Claude Code** and **Slack**, this project 
 
 ## 🤖 What is this?
 
+![n8n Gemini Workflow](./assets/img/workflow_preview.png)
+
 This project creates a bridge between **n8n** and the **Google Gemini CLI**. It allows you to chat with a powerful, context-aware AI agent directly from Telegram, with the AI running locally on your server (via SSH).
 
 **Key Differences from the Original:**
