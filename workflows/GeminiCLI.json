@@ -1,0 +1,164 @@
+{
+  "name": "GeminiCLI",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "c3277e70-2653-4d65-8d9b-f357e9f44195",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        256,
+        -352
+      ],
+      "webhookId": "your-webhook-id-here",
+      "credentials": {
+        "telegramApi": {
+          "id": "CREDENTIAL_ID_PLACEHOLDER",
+          "name": "Telegram Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $node[\"Telegram Trigger\"].json.message.chat.id }}",
+        "text": "={{ $json.stdout }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "1f29c140-98d5-439f-938b-6a8710feb756",
+      "name": "Telegram Reply",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        928,
+        -256
+      ],
+      "webhookId": "WEBHOOK_ID_PLACEHOLDER",
+      "credentials": {
+        "telegramApi": {
+          "id": "CREDENTIAL_ID_PLACEHOLDER",
+          "name": "Telegram Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// This node ensures special characters in your prompt don't break the SSH command\n// It also sets the Telegram Chat ID as the Session ID so the bot \"remembers\" you.\n\nconst prompt = $input.item.json.message.text.replace(/\"/g, '\\\\\"');\nconst sessionId = $input.item.json.message.chat.id;\n\nreturn {\n  prompt,\n  sessionId\n};"
+      },
+      "id": "7901bd96-c998-4304-8c70-da08e406f3e3",
+      "name": "Sanitize & Set Session",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        -256
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=gemini \"{{ $('Sanitize & Set Session').item.json.prompt }}\" --resume latest --approval-mode yolo",
+        "cwd": "/path/to/workdir"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        704,
+        -256
+      ],
+      "id": "3e993f8c-3396-49f1-8aaf-beb4dd333744",
+      "name": "Execute a command",
+      "credentials": {
+        "sshPassword": {
+          "id": "CREDENTIAL_ID_PLACEHOLDER",
+          "name": "Ubuntu SSH Password account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendChatAction",
+        "chatId": "={{ $json.message.chat.id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        -448
+      ],
+      "id": "609b6008-7743-4cc0-bfe3-9efe5f6f171a",
+      "name": "Typing Action",
+      "webhookId": "WEBHOOK_ID_PLACEHOLDER",
+      "credentials": {
+        "telegramApi": {
+          "id": "CREDENTIAL_ID_PLACEHOLDER",
+          "name": "Telegram Gemini"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Typing Action",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Sanitize & Set Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sanitize & Set Session": {
+      "main": [
+        [
+          {
+            "node": "Execute a command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a command": {
+      "main": [
+        [
+          {
+            "node": "Telegram Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Typing Action": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "VERSION_ID_PLACEHOLDER",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "INSTANCE_ID_PLACEHOLDER"
+  },
+  "id": "WORKFLOW_ID_PLACEHOLDER",
+  "tags": []
+}
