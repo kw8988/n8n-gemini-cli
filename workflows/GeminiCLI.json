@@ -64,7 +64,7 @@
     },
     {
       "parameters": {
-        "command": "=gemini \"{{ $('Sanitize & Set Session').item.json.prompt }}\" --resume latest --approval-mode yolo",
+        "command": "=timeout 120s gemini \"{{ $('Sanitize & Set Session').item.json.prompt }}\" --resume latest --approval-mode yolo",
         "cwd": "/path/to/workdir"
       },
       "type": "n8n-nodes-base.ssh",
