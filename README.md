@@ -31,7 +31,7 @@ This project creates a bridge between **n8n** and the **Google Gemini CLI**. It 
     *   Sanitizes your text.
     *   Prepares the environment.
 3.  **SSH Tunnel:** n8n logs into your host machine via SSH.
-4.  **Gemini Execution:** It runs the command: `gemini "Your prompt" --resume latest --approval-mode yolo`.
+4.  **Gemini Execution:** It runs the command: `timeout 120s gemini "Your prompt" --resume latest --approval-mode yolo`.
 5.  **Reply:** The output (or error) is sent back to your Telegram chat.
 
 ## 🛠️ Prerequisites
@@ -97,3 +97,6 @@ This workflow executes the Gemini CLI in **YOLO mode**.
 ## 📄 License
 
 This project is licensed under the MIT License.
+### 3. Process Safety (Timeout)
+To prevent the server'\''s CPU from being consumed by "zombie" processes (commands that hang or fail to exit), the workflow uses the `timeout 120s` command.
+*   **Safety:** This ensures that no matter what happens (connection drop, AI loop, etc.), the process will be forcefully terminated after 2 minutes.
